@@ -157,6 +157,26 @@ require('lazy').setup {
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
+  { 'godlygeek/tabular', cmd = { 'Tabularize' } },
+
+  {
+    'mbbill/undotree',
+    config = function()
+      vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+
+      if vim.fn.has 'persistent_undo' then
+        local target_path = vim.fn.expand '~/.undodir'
+
+        if not vim.fn.isdirectory(target_path) then
+          vim.fn.mkdir(target_path, 'p', 0700)
+        end
+
+        vim.opt.undodir = target_path
+        vim.opt.undofile = true
+      end
+    end,
+  },
+
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following lua:
   --    require('gitsigns').setup({ ... })
@@ -175,6 +195,18 @@ require('lazy').setup {
     },
   },
 
+  -- Vim Fugitive
+  {
+    'tpope/vim-fugitive',
+    config = function()
+      vim.keymap.set('n', '<leader>gs', ':vertical Git<CR>', { desc = 'Open [G]it [S]tatus' })
+      vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', { desc = 'Open [G]it [C]ommit' })
+      vim.keymap.set('n', '<leader>gp', ':Git push<CR>', { desc = 'Open [G]it [P]ush' })
+      vim.keymap.set('n', '<leader>gl', ':Git pull<CR>', { desc = 'Open [G]it pu[L]l' })
+      vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', { desc = 'Open [G]it [B]lame' })
+    end,
+  },
+
   -- Github Copilot
   {
     'github/copilot.vim',
@@ -185,7 +217,7 @@ require('lazy').setup {
     },
     config = function()
       -- Accept the suggestion
-      vim.keymap.set('i', '<C-Y>', "copilot#accept('\\<CR>')", { desc = 'Accept Copilot suggestion', expr = true, replace_keycodes = false })
+      vim.keymap.set('i', '<C-Y>', "copilot#Accept('\\<CR>')", { desc = 'Accept Copilot suggestion', expr = true, replace_keycodes = false })
       vim.g.copilot_no_tab_map = true
     end,
   },
@@ -201,23 +233,11 @@ require('lazy').setup {
       }
 
       -- Python Config
-      g.ale_python_auto_pipenv = 1
-      g.ale_python_auto_virtualenv = 1
-
-      -- Mypy config
-      g.ale_python_mypy_auto_pyenv = 1
-
-      -- Pylint config
-      g.ale_python_pylint_auto_pyenv = 1
-
       g.ale_fixers = {
         python = { 'black' },
       }
 
       g.ale_fix_on_save = 1
-
-      -- Black
-      g.ale_python_black_auto_pipenv = 1
 
       vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
         pattern = { '*.py' },
@@ -229,7 +249,7 @@ require('lazy').setup {
             -- Extract the project root, the folder after shape/monorepo
             local index
             if string.find(file, 'shape/monorepo%-wt1') then
-              index = string.find(file, 'shape/monorepo%-wt1') + string.len 'shape/monorepo%-wt1'
+              index = string.find(file, 'shape/monorepo%-wt1') + string.len 'shape/monorepo-wt1'
             else
               index = string.find(file, 'shape/monorepo') + string.len 'shape/monorepo'
             end
@@ -238,17 +258,15 @@ require('lazy').setup {
               return
             end
 
-            local without_monorepo_root = string.sub(file, index)
+            local without_monorepo_root = string.sub(file, index + 1)
             local slash_index = string.find(without_monorepo_root, '/')
             local project_name = string.sub(without_monorepo_root, 0, slash_index - 1)
 
             local project_root = '~/shape/monorepo/' .. project_name .. '/'
-
             -- Set the project root
-            g.ale_root.python = project_root
-            g.ale_python_mypy_options = '--config-file ~/shape/monorepo/configs/mypy.ini ./src'
-            g.ale_python_black_options = '--config=~/shape/monorepo/configs/pyproject.toml'
-            g.ale_python_pylint_options = '--rcfile ' .. project_root .. 'pyproject.toml ./src'
+            g.ale_python_mypy_options = '--config-file ~/shape/monorepo/configs/mypy.ini'
+            g.ale_python_black_options = '--config ~/shape/monorepo/configs/pyproject.toml'
+            g.ale_python_pylint_options = "--rcfile '" .. project_root .. "pyproject.toml'"
           end
         end,
       })
@@ -275,15 +293,6 @@ require('lazy').setup {
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
       require('which-key').setup()
-
-      -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-      }
     end,
   },
   {
@@ -321,11 +330,12 @@ require('lazy').setup {
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires special font.
-      --  If you already have a Nerd Font, or terminal set up with fallback fonts
-      --  you can enable this
-      -- { 'nvim-tree/nvim-web-devicons' }
+      {
+        'nvim-telescope/telescope-live-grep-args.nvim',
+        -- This will not install any breaking changes.
+        -- For major updates, this must be adjusted manually.
+        version = '^1.0.0',
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -369,6 +379,7 @@ require('lazy').setup {
       -- Enable telescope extensions, if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'live_grep_args')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -378,6 +389,8 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>fg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = '[F]ind by [G]rep with args' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
@@ -582,7 +595,6 @@ require('lazy').setup {
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        python = { 'black' },
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
         -- javascript = { { "prettierd", "prettier" } },
@@ -690,16 +702,21 @@ require('lazy').setup {
     -- change the command in the config to whatever the name of that colorscheme is
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
-    'folke/tokyonight.nvim',
+    'navarasu/onedark.nvim',
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      -- Load the colorscheme here
-      vim.cmd.colorscheme 'tokyonight-night'
-
+      require('onedark').setup {
+        style = 'darker', -- Options: 'dark', 'deep', 'cool', 'warm' ,'warmer'
+      }
+      require('onedark').load()
       -- You can configure highlights by doing something like
       vim.cmd.hi 'Comment gui=none'
     end,
+  },
+
+  {
+    'nvim-lualine/lualine.nvim',
   },
 
   -- Highlight todo, notes, etc in comments
@@ -750,7 +767,7 @@ require('lazy').setup {
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'python' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'python', 'typescript' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = { enable = true },
