@@ -26,127 +26,15 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup {
+  {
+    "ellisonleao/gruvbox.nvim",
+    priority = 1000,
+    config = function()
+      vim.cmd [[colorscheme gruvbox]]
+    end,
+  },
+  { import = 'plugins' },
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  { 'numToStr/Comment.nvim', opts = {} },
-  { 'godlygeek/tabular', cmd = { 'Tabularize' } },
-  {
-    'mbbill/undotree',
-    config = function()
-      vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
-
-      if vim.fn.has 'persistent_undo' then
-        local target_path = vim.fn.expand '~/.undodir'
-
-        if not vim.fn.isdirectory(target_path) then
-          vim.fn.mkdir(target_path, 'p', 0700)
-        end
-
-        vim.opt.undodir = target_path
-        vim.opt.undofile = true
-      end
-    end,
-  },
-
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-    },
-  },
-
-  -- Vim Fugitive
-  {
-    'tpope/vim-fugitive',
-    config = function()
-      vim.keymap.set('n', '<leader>gs', ':vertical Git<CR>', { desc = 'Open [G]it [S]tatus' })
-      vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', { desc = 'Open [G]it [C]ommit' })
-      vim.keymap.set('n', '<leader>gp', ':Git push<CR>', { desc = 'Open [G]it [P]ush' })
-      vim.keymap.set('n', '<leader>gl', ':Git pull<CR>', { desc = 'Open [G]it pu[L]l' })
-      vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', { desc = 'Open [G]it [B]lame' })
-    end,
-  },
-
-  -- Github Copilot
-  {
-    'github/copilot.vim',
-    opts = {
-      copilot_filetypes = {
-        -- To Add mode filetypes add: 'type': true
-      },
-    },
-    config = function()
-      -- Accept the suggestion
-      vim.keymap.set('i', '<C-Y>', "copilot#Accept('\\<CR>')", { desc = 'Accept Copilot suggestion', expr = true, replace_keycodes = false })
-      vim.g.copilot_no_tab_map = true
-    end,
-  },
-
-  {
-    'dense-analysis/ale',
-    config = function()
-      -- Configuration goes here.
-      local g = vim.g
-
-      -- Configure ALE
-      g.ale_linters = {
-        python = { 'ruff', 'pyright' },
-        sql = { 'sqlfluff' },
-        go = { 'golsp' },
-        c = { 'clang' },
-      }
-
-      -- Create a new sql fixer
-      local function sqlfluff_fix()
-        return {
-          command = 'sqlfluff fix --force --config ~/shape/monorepo/configs/.sqlfluff -',
-        }
-      end
-
-      g.ale_fixers = {
-        python = { 'ruff' },
-        json = { 'jq' },
-        sql = { sqlfluff_fix },
-        go = { 'gofmt', 'goimports' },
-        c = { 'clang-format' },
-      }
-
-      g.ale_sql_sqlfluff_options = '--dialect postgres --config ~/shape/monorepo/configs/.sqlfluff'
-      g.ale_fix_on_save = 1
-    end,
-  },
-
-  {
-    "rhysd/vim-lsp-ale",
-  },
-
-  -- NOTE: Plugins can also be configured to run lua code when they are loaded.
-  --
-  -- This is often very useful to both group configuration, as well as handle
-  -- lazy loading plugins that don't need to be loaded immediately at startup.
-  --
-  -- For example, in the following configuration, we use:
-  --  event = 'VimEnter'
-  --
-  -- which loads which-key before all the UI elements are loaded. Events can be
-  -- normal autocommands events (`:help autocmd-events`).
-  --
-  -- Then, because we use the `config` key, the configuration only runs
-  -- after the plugin has been loaded:
-  --  config = function() ... end
-
-  { -- Useful plugin to show you pending keybinds.
-    'folke/which-key.nvim',
-    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      require('which-key').setup()
-    end,
-  },
   {
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
@@ -156,12 +44,6 @@ require('lazy').setup {
     end,
     ft = { 'markdown' },
   },
-  --
-  -- The dependencies are proper plugin specifications as well - anything
-  -- you do for a plugin at the top level, you can do for a dependency.
-  --
-  -- Use the `dependencies` key to specify the dependencies of a particular plugin
-
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
@@ -495,32 +377,13 @@ require('lazy').setup {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
-          { name = 'copilot' },
         },
       }
     end,
   },
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`
-    'navarasu/onedark.nvim',
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
-    priority = 1000, -- make sure to load this before all the other start plugins
-    config = function()
-      require('onedark').setup {
-        style = 'darker', -- Options: 'dark', 'deep', 'cool', 'warm' ,'warmer'
-      }
-      require('onedark').load()
-      -- You can configure highlights by doing something like
-      vim.cmd.hi 'Comment gui=none'
-    end,
-  },
-
   {
     'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
 
   -- Highlight todo, notes, etc in comments
@@ -583,5 +446,11 @@ require('lazy').setup {
       'vrischmann/tree-sitter-templ',
     },
   },
-  -- { import = 'plugins' },
+  { -- Useful plugin to show you pending keybinds.
+    'folke/which-key.nvim',
+    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    config = function() -- This is the function that runs, AFTER loading
+      require('which-key').setup()
+    end,
+  },
 }

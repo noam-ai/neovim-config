@@ -31,3 +31,13 @@ vim.keymap.set('v', '<', '<gv', { desc = 'Shift text to the left' })
 -- J / K on visual mode to move selected lines up and down
 vim.keymap.set('x', 'J', ":move '>+1<CR>gv-gv", { desc = 'Move selected lines down' })
 vim.keymap.set('x', 'K', ":move '<-2<CR>gv-gv", { desc = 'Move selected lines up' })
+
+-- Yank to clipboard
+vim.keymap.set('v', '<leader>y', '"+y', { desc = '[Y]ank to clipboard' })
+
+-- Git fugitive keymaps
+vim.keymap.set('n', '<leader>gs', ':vertical Git<CR>', { desc = 'Open [G]it [S]tatus' })
+vim.keymap.set('n', '<leader>gc', ':Git commit<CR>', { desc = 'Open [G]it [C]ommit' })
+vim.keymap.set('n', '<leader>gp', ':Git push<CR>', { desc = 'Open [G]it [P]ush' })
+vim.keymap.set('n', '<leader>gl', ':Git pull<CR>', { desc = 'Open [G]it pu[L]l' })
+vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', { desc = 'Open [G]it [B]lame' })
