@@ -1,3 +1,7 @@
+-- Set leader key to space
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 -- Make line numbers default
 vim.opt.number = true
 
@@ -5,7 +9,7 @@ vim.opt.number = true
 vim.opt.rnu = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+vim.opt.mouse = "a"
 
 -- Don't show the mode, since it's already in status line
 vim.opt.showmode = false
@@ -21,7 +25,7 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
-vim.opt.signcolumn = 'yes'
+vim.opt.signcolumn = "yes"
 
 -- Decrease update time
 vim.opt.updatetime = 250
@@ -35,7 +39,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 -- Show which line your cursor is on
 vim.opt.cursorline = true
@@ -45,15 +49,15 @@ vim.opt.cursorcolumn = true
 vim.opt.scrolloff = 20
 
 -- Show the 80 char limit and the 120 char limit
-vim.opt.colorcolumn = '80,120'
+vim.opt.colorcolumn = "80,120"
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.hlsearch = true
 
 -- Set the shell for commands
-vim.opt.shell = '/bin/zsh'
+vim.opt.shell = "/bin/zsh"
 
 -- Spell checking
 vim.opt.spell = true
-vim.opt.spelllang = 'en_us'
-vim.opt.spelloptions = 'camel,noplainbuffer'
+vim.opt.spelllang = "en_us"
+vim.opt.spelloptions = "camel,noplainbuffer"
