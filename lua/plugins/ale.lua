@@ -50,7 +50,6 @@ return {
 		"rhysd/vim-lsp-ale",
 		config = function()
 			local g = vim.g
-
 			-- Enable LSP linting
 			g.lsp_ale_auto_enable_linter = 1
 			g.lsp_ale_diagnostics_severity = "hint"
