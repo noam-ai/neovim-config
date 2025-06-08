@@ -13,7 +13,9 @@ local python_servers = {
 }
 
 local web_servers = {
-	ts_ls = {},
+	ts_ls = {
+		filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+	},
 	templ = {
 		filetypes = { "templ" },
 	},
@@ -41,7 +43,6 @@ local go_servers = {
 
 local lua_servers = {
 	lua_ls = {
-
 		settings = {
 			Lua = {
 				runtime = { version = "LuaJIT" },
@@ -53,33 +54,39 @@ local lua_servers = {
 						"${3rd}/luv/library",
 						unpack(vim.api.nvim_get_runtime_file("", true)),
 					},
-					-- If lua_ls is really slow on your computer, you can try this instead:
-					-- library = { vim.env.VIMRUNTIME },
 				},
 				completion = {
 					callSnippet = "Replace",
 				},
-				-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-				-- diagnostics = { disable = { 'missing-fields' } },
+				diagnostics = {
+					-- Get the language server to recognize the `vim` global
+					globals = { "vim" },
+				},
 			},
 		},
 	},
 }
 
 local function get_servers()
-	return {
-		-- Python
-		unpack(python_servers),
+	local all_servers = {}
 
-		-- Web
-		unpack(web_servers),
+	for k, v in pairs(python_servers) do
+		all_servers[k] = v
+	end
 
-		-- Go
-		unpack(go_servers),
+	for k, v in pairs(web_servers) do
+		all_servers[k] = v
+	end
 
-		-- Lua
-		unpack(lua_servers),
-	}
+	for k, v in pairs(go_servers) do
+		all_servers[k] = v
+	end
+
+	for k, v in pairs(lua_servers) do
+		all_servers[k] = v
+	end
+
+	return all_servers
 end
 
 local function disable_ruff_hover(args)

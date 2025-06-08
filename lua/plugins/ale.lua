@@ -35,11 +35,10 @@ return {
 				sql = { sqlfluff_fix },
 				go = { "gofmt", "goimports" },
 				c = { "clang-format" },
-				typescript = { "eslint" },
-				typescriptreact = { "eslint" },
-				javascript = { "eslint" },
-				javascriptreact = { "eslint" },
-				lua = { "stylua" },
+				typescript = { "prettier" },
+				typescriptreact = { "prettier" },
+				javascript = { "prettier" },
+				javascriptreact = { "prettier" },
 			}
 
 			g.ale_sql_sqlfluff_options = "--dialect postgres --config ~/shape/monorepo/configs/.sqlfluff"
